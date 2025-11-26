@@ -194,32 +194,30 @@ fun PresentScreen(
                 .background(COLORS[id])
                 .padding(40.dp)
         )
-        Row {
-            BasicText(
-                "Return to the [main screen]",
-                modifier = Modifier
-                    .padding(8.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                    .clickable(onClick = onBack)
-                    .padding(8.dp)
-            )
-            val otherPresent = (id + 1) % PRESENTS_COUNT
-            BasicText(
-                "Open [PRESENT $otherPresent]",
-                modifier = Modifier
-                    .padding(8.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                    .clickable(onClick = { onOpenPresent(otherPresent) })
-                    .padding(8.dp)
-            )
-            BasicText(
-                "Replace the current with [PRESENT $otherPresent]",
-                modifier = Modifier
-                    .padding(8.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                    .clickable(onClick = { onChangePresent(otherPresent) })
-                    .padding(8.dp)
-            )
-        }
+        BasicText(
+            "Return to the [main screen]",
+            modifier = Modifier
+                .padding(8.dp)
+                .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+                .clickable(onClick = onBack)
+                .padding(8.dp)
+        )
+        val otherPresent = (id + 1) % PRESENTS_COUNT
+        BasicText(
+            "Open [PRESENT $otherPresent]",
+            modifier = Modifier
+                .padding(8.dp)
+                .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+                .clickable(onClick = { onOpenPresent(otherPresent) })
+                .padding(8.dp)
+        )
+        BasicText(
+            "Replace the current with [PRESENT $otherPresent]",
+            modifier = Modifier
+                .padding(8.dp)
+                .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
+                .clickable(onClick = { onChangePresent(otherPresent) })
+                .padding(8.dp)
+        )
     }
 }
