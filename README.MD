@@ -64,4 +64,62 @@ such as displaying a dialog asking if the user wants to leave the application.
 https://terrakok.github.io/navigation3-browser/
 
 ## How to use
+#### Add dependency:
 `//todo`
+
+⚠️ You are supposed to select needed type and to configure BrowserHistory integration onc in your application.  
+You can do it depending on a browser type: Desktop or Mobile.
+
+#### Chronological Navigation:
+```kotlin
+data object Root
+data class Profile(val id: Int)
+
+@Composable
+fun App() {
+    val backStack = remember { mutableStateListOf<Any>(Root) }
+    LaunchedEffect(Unit) {
+        bindBackStackToBrowserHistory(
+            backStack = backStack,
+            saveKey = { key ->
+                when (key) {
+                    is Root -> buildBrowserHistoryFragment("root")
+                    is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
+                    else -> null
+                }.toString()
+            },
+            restoreKey = { fragment ->
+                when (getBrowserHistoryFragmentName(fragment)) {
+                    "root" -> Root
+                    "profile" -> Profile(
+                        getBrowserHistoryFragmentParameters(fragment).getValue("id")?.toInt()
+                            ?: error("id is required")
+                    )
+                    else -> null
+                }
+            }
+        )
+    }
+    NavDisplay(backStack) {...}
+}
+```
+#### Hierarchical Navigation:
+```kotlin
+data object Root
+data class Profile(val id: Int)
+
+@Composable
+fun App() {
+    val backStack = remember { mutableStateListOf<Any>(Root) }
+    ConfigureBrowserBack(
+        currentDestinationName = {
+            when (val key = backStack.lastOrNull()) {
+                is Root -> buildBrowserHistoryFragment("root")
+                is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
+                else -> null
+            }.toString()
+        },
+    )
+    NavDisplay(backStack) {...}
+}
+```
