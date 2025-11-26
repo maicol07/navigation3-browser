@@ -15,6 +15,7 @@ internal external interface BrowserHistory {
     val state: String?
     fun pushState(data: String?, title: String, url: String?)
     fun replaceState(data: String?, title: String, url: String?)
+    fun go(delta: Int)
 }
 
 internal external interface BrowserEvent
