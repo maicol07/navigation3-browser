@@ -2,6 +2,7 @@ package sample.app
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorProducer
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeViewport
 import androidx.navigation3.runtime.entryProvider
@@ -29,28 +33,28 @@ import com.github.terrakok.navigation3.browser.getBrowserHistoryFragmentParamete
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = ComposeViewport { App() }
 
-data object RouteA
+data object Main
 
-data class RouteB(val id: Int)
+data class Present(val id: Int)
 
 @Composable
 fun App() {
-    val backStack = remember { mutableStateListOf<Any>(RouteA) }
+    val backStack = remember { mutableStateListOf<Any>(Main) }
 
     LaunchedEffect(Unit) {
         bindBackStackToBrowserHistory(
             backStack = backStack,
             saveItem = { key ->
                 when (key) {
-                    is RouteA -> buildBrowserHistoryFragment("root")
-                    is RouteB -> buildBrowserHistoryFragment("screenB", mapOf("id" to key.id.toString()))
+                    is Main -> buildBrowserHistoryFragment("main")
+                    is Present -> buildBrowserHistoryFragment("present", mapOf("id" to key.id.toString()))
                     else -> null
                 }.toString()
             },
             restoreItem = { fragment ->
                 when (getBrowserHistoryFragmentName(fragment)) {
-                    "root" -> RouteA
-                    "screenB" -> RouteB(
+                    "main" -> Main
+                    "present" -> Present(
                         getBrowserHistoryFragmentParameters(fragment).getValue("id")?.toInt() ?: error("id is required")
                     )
 
@@ -64,33 +68,18 @@ fun App() {
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
         entryProvider = entryProvider {
-            entry<RouteA> {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    BasicText("Route A")
-                    LazyColumn {
-                        items(10) { i ->
-                            BasicText(
-                                text = "Item $i",
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .background(Color.LightGray)
-                                    .clickable(onClick = { backStack.add(RouteB(i)) })
-                                    .padding(8.dp)
-                            )
-                        }
-                    }
-                }
+            entry<Main> {
+                MainScreen(
+                    onBuyPresent = { backStack.add(Present(it)) }
+                )
             }
-            entry<RouteB> { key ->
-                ScreenB(
+            entry<Present> { key ->
+                PresentScreen(
                     id = key.id,
                     onBack = { backStack.removeLast() },
-                    onReplace = {
+                    onChangePresent = {
                         backStack.removeLast()
-                        backStack.add(RouteB(it))
+                        backStack.add(Present(it))
                     }
                 )
             }
@@ -98,38 +87,82 @@ fun App() {
     )
 }
 
+private const val PRESENTS_COUNT = 3
+
 @Composable
-fun ScreenB(
-    id: Int,
-    onBack: () -> Unit,
-    onReplace: (Int) -> Unit
+fun MainScreen(
+    onBuyPresent: (id: Int) -> Unit,
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            BasicText("$id: Screen $id")
-            Row {
+        BasicText(
+            text = "Buy a present!",
+            color = { Color.White },
+            modifier = Modifier
+                .padding(16.dp)
+                .background(Color.Red)
+                .padding(60.dp)
+        )
+        LazyColumn {
+            items(PRESENTS_COUNT) { i ->
                 BasicText(
-                    "Back",
+                    text = "PRESENT $i",
                     modifier = Modifier
                         .padding(8.dp)
                         .background(Color.LightGray)
-                        .clickable(onClick = onBack)
-                        .padding(8.dp)
-                )
-                BasicText(
-                    "Replace with `${id + 1}`",
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .background(Color.LightGray)
-                        .clickable(onClick = { onReplace(id + 1) })
+                        .clickable(onClick = { onBuyPresent(i) })
                         .padding(8.dp)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun PresentScreen(
+    id: Int,
+    onBack: () -> Unit,
+    onChangePresent: (Int) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        BasicText(
+            text = "Thank you! Your gift is on the way!",
+            style = TextStyle.Default.copy(fontWeight = FontWeight.Bold),
+        )
+        BasicText(
+            text = "PRESENT $id",
+            style = TextStyle.Default.copy(color = Color.White, fontWeight = FontWeight.Bold),
+            modifier = Modifier
+                .padding(16.dp)
+                .background(Color.Blue)
+                .padding(60.dp)
+        )
+        Row {
+            BasicText(
+                "DONE",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .background(Color.LightGray)
+                    .clickable(onClick = onBack)
+                    .padding(8.dp)
+            )
+            val otherPresent = (id + 1) % PRESENTS_COUNT
+            BasicText(
+                "Change to PRESENT `$otherPresent`",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .background(Color.LightGray)
+                    .clickable(onClick = { onChangePresent(otherPresent) })
+                    .padding(8.dp)
+            )
         }
     }
 }
