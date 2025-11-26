@@ -67,8 +67,8 @@ https://terrakok.github.io/navigation3-browser/
 #### Add dependency:
 `//todo`
 
-⚠️ You are supposed to select needed type and to configure BrowserHistory integration onc in your application.  
-You can do it depending on a browser type: Desktop or Mobile.
+⚠️ You are supposed to select needed type and to configure BrowserHistory integration **only once** in your application.  
+You can do it depending on a browser type: **Desktop or Mobile**.
 
 #### Chronological Navigation:
 ```kotlin
