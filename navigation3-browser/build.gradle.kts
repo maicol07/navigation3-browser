@@ -11,9 +11,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.ui)
-            implementation(compose.foundation)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.ui)
+            implementation(libs.androidx.nav3.ui)
         }
 
         commonTest.dependencies {
@@ -28,7 +28,7 @@ kotlin {
 //https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html
 mavenPublishing {
     publishToMavenCentral()
-    coordinates("com.github.terrakok.navigation3.browser", "navigation3-browser", "1.0.0")
+    coordinates("com.github.terrakok", "navigation3-browser", "1.0.0")
 
     pom {
         name = "navigation3-browser"
