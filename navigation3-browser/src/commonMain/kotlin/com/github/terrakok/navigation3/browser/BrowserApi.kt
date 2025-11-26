@@ -1,5 +1,10 @@
 package com.github.terrakok.navigation3.browser
 
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+
 internal external interface BrowserLocation {
     val origin: String
     val pathname: String
@@ -36,3 +41,19 @@ internal external fun decodeURIComponent(str: String): String
 internal external fun encodeURIComponent(str: String): String
 
 internal expect fun refBrowserWindow(): BrowserWindow
+
+@OptIn(DelicateCoroutinesApi::class)
+@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+internal fun BrowserWindow.popStateEvents(): Flow<BrowserPopStateEvent> = callbackFlow {
+    val localWindow = this@popStateEvents
+    val callback: (BrowserEvent) -> Unit = { event: BrowserEvent ->
+        if (!isClosedForSend) {
+            (event as? BrowserPopStateEvent)?.let { trySend(it) }
+        }
+    }
+
+    localWindow.addEventListener("popstate", callback)
+    awaitClose {
+        localWindow.removeEventListener("popstate", callback)
+    }
+}

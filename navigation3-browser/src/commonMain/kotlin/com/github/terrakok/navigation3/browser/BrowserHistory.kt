@@ -2,20 +2,12 @@ package com.github.terrakok.navigation3.browser
 
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import kotlin.concurrent.atomics.AtomicBoolean
-import kotlin.concurrent.atomics.ExperimentalAtomicApi
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-
-@OptIn(ExperimentalAtomicApi::class)
-private val BrowserHistoryIsInUse = AtomicBoolean(false)
+import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
 @OptIn(ExperimentalAtomicApi::class)
 suspend fun <T> bindBackStackToBrowserHistory(
@@ -101,21 +93,5 @@ suspend fun <T> bindBackStackToBrowserHistory(
         }
     } catch (_: CancellationException) {
         BrowserHistoryIsInUse.store(false)
-    }
-}
-
-@OptIn(DelicateCoroutinesApi::class)
-@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-private fun BrowserWindow.popStateEvents(): Flow<BrowserPopStateEvent> = callbackFlow {
-    val localWindow = this@popStateEvents
-    val callback: (BrowserEvent) -> Unit = { event: BrowserEvent ->
-        if (!isClosedForSend) {
-            (event as? BrowserPopStateEvent)?.let { trySend(it) }
-        }
-    }
-
-    localWindow.addEventListener("popstate", callback)
-    awaitClose {
-        localWindow.removeEventListener("popstate", callback)
     }
 }
