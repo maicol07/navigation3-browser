@@ -85,7 +85,7 @@ fun App() {
                 is Root -> buildBrowserHistoryFragment("root")
                 is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
                 else -> null
-            }.toString()
+            }
         },
         restoreKey = { fragment ->
             when (getBrowserHistoryFragmentName(fragment)) {
@@ -115,7 +115,7 @@ fun App() {
                 is Root -> buildBrowserHistoryFragment("root")
                 is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
                 else -> null
-            }.toString()
+            }
         },
     )
     NavDisplay(backStack) {...}
