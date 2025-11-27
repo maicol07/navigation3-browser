@@ -78,28 +78,26 @@ data class Profile(val id: Int)
 @Composable
 fun App() {
     val backStack = remember { mutableStateListOf<Any>(Root) }
-    LaunchedEffect(Unit) {
-        bindBackStackToBrowserHistory(
-            backStack = backStack,
-            saveKey = { key ->
-                when (key) {
-                    is Root -> buildBrowserHistoryFragment("root")
-                    is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
-                    else -> null
-                }.toString()
-            },
-            restoreKey = { fragment ->
-                when (getBrowserHistoryFragmentName(fragment)) {
-                    "root" -> Root
-                    "profile" -> Profile(
-                        getBrowserHistoryFragmentParameters(fragment).getValue("id")?.toInt()
-                            ?: error("id is required")
-                    )
-                    else -> null
-                }
+    ChronologicalBrowserNavigation(
+        backStack = backStack,
+        saveKey = { key ->
+            when (key) {
+                is Root -> buildBrowserHistoryFragment("root")
+                is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
+                else -> null
+            }.toString()
+        },
+        restoreKey = { fragment ->
+            when (getBrowserHistoryFragmentName(fragment)) {
+                "root" -> Root
+                "profile" -> Profile(
+                    getBrowserHistoryFragmentParameters(fragment).getValue("id")?.toInt()
+                        ?: error("id is required")
+                )
+                else -> null
             }
-        )
-    }
+        }
+    )
     NavDisplay(backStack) {...}
 }
 ```
@@ -111,7 +109,7 @@ data class Profile(val id: Int)
 @Composable
 fun App() {
     val backStack = remember { mutableStateListOf<Any>(Root) }
-    ConfigureBrowserBack(
+    HierarchicalBrowserNavigation(
         currentDestinationName = {
             when (val key = backStack.lastOrNull()) {
                 is Root -> buildBrowserHistoryFragment("root")

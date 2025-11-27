@@ -24,7 +24,7 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
  * Usage example:
  *
  * ```kotlin
- * ConfigureBrowserBack(
+ * HierarchicalBrowserNavigation(
  *     currentDestinationName = {
  *         when (val key = backStack.lastOrNull()) {
  *             is Root -> buildBrowserHistoryFragment("root")
@@ -45,7 +45,7 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
  * (including leading `#`), or `null` if none. See [buildBrowserHistoryFragment].
  */
 @Composable
-fun ConfigureBrowserBack(
+fun HierarchicalBrowserNavigation(
     currentDestinationName: () -> String?,
 ) {
     val navigationEventDispatcher = LocalNavigationEventDispatcherOwner.current?.navigationEventDispatcher

@@ -26,8 +26,8 @@ import androidx.compose.ui.window.ComposeViewport
 import androidx.compose.ui.window.Dialog
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.github.terrakok.navigation3.browser.ConfigureBrowserBack
-import com.github.terrakok.navigation3.browser.bindBackStackToBrowserHistory
+import com.github.terrakok.navigation3.browser.ChronologicalBrowserNavigation
+import com.github.terrakok.navigation3.browser.HierarchicalBrowserNavigation
 import com.github.terrakok.navigation3.browser.buildBrowserHistoryFragment
 import com.github.terrakok.navigation3.browser.getBrowserHistoryFragmentName
 import com.github.terrakok.navigation3.browser.getBrowserHistoryFragmentParameters
@@ -76,37 +76,35 @@ fun App() {
             }
         }
     } else if (mode) {
-        LaunchedEffect(Unit) {
-            bindBackStackToBrowserHistory(
-                backStack = backStack,
-                saveKey = { key ->
-                    when (key) {
-                        is Root -> buildBrowserHistoryFragment("root")
-                        is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
-                        else -> null
-                    }.toString()
-                },
-                restoreKey = { fragment ->
-                    when (getBrowserHistoryFragmentName(fragment)) {
-                        "root" -> Root
-                        "profile" -> Profile(
-                            getBrowserHistoryFragmentParameters(fragment).getValue("id")?.toInt()
-                                ?: error("id is required")
-                        )
-
-                        else -> null
-                    }
+        ChronologicalBrowserNavigation(
+            backStack = backStack,
+            saveKey = { key ->
+                when (key) {
+                    is Root -> buildBrowserHistoryFragment("root")
+                    is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
+                    else -> null
                 }
-            )
-        }
+            },
+            restoreKey = { fragment ->
+                when (getBrowserHistoryFragmentName(fragment)) {
+                    "root" -> Root
+                    "profile" -> Profile(
+                        getBrowserHistoryFragmentParameters(fragment).getValue("id")?.toInt()
+                            ?: error("id is required")
+                    )
+
+                    else -> null
+                }
+            }
+        )
     } else {
-        ConfigureBrowserBack(
+        HierarchicalBrowserNavigation(
             currentDestinationName = {
                 when (val key = backStack.lastOrNull()) {
                     is Root -> buildBrowserHistoryFragment("root")
                     is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
                     else -> null
-                }.toString()
+                }
             },
         )
     }

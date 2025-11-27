@@ -1,5 +1,7 @@
 package com.github.terrakok.navigation3.browser
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import kotlinx.coroutines.coroutineScope
@@ -19,25 +21,23 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
  * Usage example:
  *
  * ```kotlin
- * LaunchedEffect(Unit) {
- *     bindBackStackToBrowserHistory(
- *         backStack = backStack,
- *         saveKey = { key ->
- *             when (key) {
- *                 is Root -> buildBrowserHistoryFragment("root")
- *                 is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
- *                 else -> null
- *             }
- *         },
- *         restoreKey = { fragment ->
- *             when (getBrowserHistoryFragmentName(fragment)) {
- *                 "root" -> Root
- *                 "profile" -> Profile(getBrowserHistoryFragmentParameters(fragment).getValue("id")!!.toInt())
- *                 else -> null
- *             }
+ * ChronologicalBrowserNavigation(
+ *     backStack = backStack,
+ *     saveKey = { key ->
+ *         when (key) {
+ *             is Root -> buildBrowserHistoryFragment("root")
+ *             is Profile -> buildBrowserHistoryFragment("profile", mapOf("id" to key.id.toString()))
+ *             else -> null
  *         }
- *     )
- * }
+ *     },
+ *     restoreKey = { fragment ->
+ *         when (getBrowserHistoryFragmentName(fragment)) {
+ *             "root" -> Root
+ *             "profile" -> Profile(getBrowserHistoryFragmentParameters(fragment).getValue("id")!!.toInt())
+ *             else -> null
+ *         }
+ *     }
+ * )
  * ```
  *
  * Notes and constraints:
@@ -47,14 +47,24 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
  *   to skip an item; skipped items are not saved to browser history.
  * - `restoreKey` must perform the inverse operation and return the back stack item for a given
  *   fragment string. Return `null` to indicate that the fragment cannot be restored.
- * - The function is `suspend` and should be called from a coroutine scope (e.g. inside `LaunchedEffect`).
  *
  * @param backStack The Compose back stack to observe and mutate.
  * @param saveKey Converts a back stack item into a URL fragment to be stored in browser history.
  * @param restoreKey Restores a back stack item from a URL fragment.
  */
+@Composable
+fun <T> ChronologicalBrowserNavigation(
+    backStack: SnapshotStateList<T>,
+    saveKey: (key: T) -> String?,
+    restoreKey: (fragment: String) -> T?
+) {
+    LaunchedEffect(Unit) {
+        bindBackStackToBrowserHistory(backStack, saveKey, restoreKey)
+    }
+}
+
 @OptIn(ExperimentalAtomicApi::class)
-suspend fun <T> bindBackStackToBrowserHistory(
+private suspend fun <T> bindBackStackToBrowserHistory(
     backStack: SnapshotStateList<T>,
     saveKey: (key: T) -> String?,
     restoreKey: (fragment: String) -> T?
