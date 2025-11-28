@@ -83,8 +83,25 @@ kotlin {
 }
 ```
 
-⚠️ You are supposed to select needed type and to configure BrowserHistory integration **only once** in your application.  
-You can do it depending on a browser type: **Desktop or Mobile**.
+✅️ You are supposed to select needed type and to configure BrowserHistory integration **only once** in your application.  
+
+<details>
+<summary>You can do it depending on a browser type: Desktop or Mobile.</summary>
+
+```kotlin
+fun isMobileBrowser(): Boolean = js(
+    """{
+          if (navigator.userAgentData && navigator.userAgentData.mobile) {
+            return navigator.userAgentData.mobile;
+          }
+          if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
+            return window.innerWidth <= 820;
+          }
+          return /Mobi|Android|iPhone|iPad|iPod|IEMobile|Opera Mini|CriOS/i.test(navigator.userAgent);
+      }"""
+)
+```
+</details>
 
 #### Chronological Navigation:
 ```kotlin
