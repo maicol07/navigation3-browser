@@ -1,6 +1,9 @@
-# navigation3-browser
+## [navigation3-browser]
+#### androidx.navigation3 browser integration
 
-This miniature library provides integration between [Androidx.Navigation3](https://developer.android.com/guide/navigation/navigation-3) and [Browser History](https://developer.mozilla.org/en-US/docs/Web/API/History_API)!  
+![](./media/logo.jpg)
+
+A tiny library to integrate [Androidx.Navigation3](https://developer.android.com/guide/navigation/navigation-3) with [Browser History](https://developer.mozilla.org/en-US/docs/Web/API/History_API)!  
 
 ---
 
@@ -65,7 +68,19 @@ https://terrakok.github.io/navigation3-browser/
 
 ## How to use
 #### Add dependency:
-`//todo`
+```kotlin
+kotlin {
+    //...
+    sourceSets {
+        //...
+        val webMain by getting {
+            dependencies {
+                implementation("com.github.terrakok:navigation3-browser:0.1.0")
+            }
+        }
+    }
+}
+```
 
 ⚠️ You are supposed to select needed type and to configure BrowserHistory integration **only once** in your application.  
 You can do it depending on a browser type: **Desktop or Mobile**.
@@ -120,4 +135,29 @@ fun App() {
     )
     NavDisplay(backStack) {...}
 }
+```
+
+## License
+```
+MIT License
+
+Copyright (c) 2024 Konstantin Tskhovrebov (@terrakok)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
