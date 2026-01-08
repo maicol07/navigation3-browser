@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
@@ -111,7 +112,8 @@ private suspend fun configureBrowserBack(
                 .map { it.state }
                 .collect { state ->
                     if (state == ROOT_ENTRY) {
-                        if (history.value.currentIndex > 0) {
+                        val isRoot = history.value.currentIndex == -1
+                        if (!isRoot) {
                             log("Hierarchical: [browser] reset history")
                             window.history.go(1)
                         } else {
