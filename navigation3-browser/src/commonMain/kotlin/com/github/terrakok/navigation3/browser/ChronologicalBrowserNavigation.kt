@@ -54,7 +54,7 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
  */
 @Composable
 fun <T> ChronologicalBrowserNavigation(
-    backStack: List<T>,
+    backStack: MutableList<T>,
     saveKey: (key: T) -> String?,
     restoreKey: (fragment: String) -> T?
 ) {
@@ -65,7 +65,7 @@ fun <T> ChronologicalBrowserNavigation(
 
 @OptIn(ExperimentalAtomicApi::class)
 private suspend fun <T> bindBackStackToBrowserHistory(
-    backStack: List<T>,
+    backStack: MutableList<T>,
     saveKey: (key: T) -> String?,
     restoreKey: (fragment: String) -> T?
 ) {
@@ -87,9 +87,7 @@ private suspend fun <T> bindBackStackToBrowserHistory(
                         // if user manually put a new address, then there is no state
                         // we try to navigate to the url fragment
                         restoreKey(window.location.hash)?.let { new ->
-                            if (backStack is MutableList) {
-                                backStack.add(new)
-                            }
+                            backStack.add(new)
                         } ?: run {
                             window.console.warn("Unable to parse url fragment: `${window.location.hash}`")
                         }
@@ -99,10 +97,8 @@ private suspend fun <T> bindBackStackToBrowserHistory(
                             val restoredBackStack = state.lines().map {
                                 restoreKey(it) ?: error("Unable to restore item: `$it`")
                             }
-                            if (backStack is MutableList) {
-                                backStack.clear()
-                                backStack.addAll(restoredBackStack)
-                            }
+                            backStack.clear()
+                            backStack.addAll(restoredBackStack)
                         } catch (e: Exception) {
                             window.console.warn(e.message ?: "Unknown error")
                             window.console.warn("Unable to restore back stack from history: `$state`")
